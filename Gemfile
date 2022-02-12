@@ -30,6 +30,7 @@ gem 'bootsnap', '>= 1.4.4', require: false
 gem 'rspec-rails', '~> 5.0.0'
 gem 'jsonapi-serializer'
 gem 'jsom-pagination'
+gem 'jsonapi_errors_handler'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
