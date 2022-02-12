@@ -12,21 +12,6 @@ class ApplicationController < ActionController::API
 
     before_action :authorize!
 
-    private
-
-    def authorize!
-      raise UserAuthenticator::AuthorizationError unless current_user
-    end
-
-    def access_token
-      provided_token = request.authorization&.gsub(/\ABearer\s/, '')
-      @access_token = AccessToken.find_by(token: provided_token)
-    end
-  
-    def current_user
-      @current_user = access_token&.user
-    end
-
     def authentication_error
       error = {
         "status" => "401",
@@ -46,5 +31,22 @@ class ApplicationController < ActionController::API
       }
       render json: { "errors": [ error ] }, status: 403
     end
+
+    private
+
+    def authorize!
+      raise UserAuthenticator::AuthorizationError unless current_user
+    end
+
+    def access_token
+      provided_token = request.authorization&.gsub(/\ABearer\s/, '')
+      @access_token = AccessToken.find_by(token: provided_token)
+    end
+  
+    def current_user
+      @current_user = access_token&.user
+    end
+
+    
 
 end
