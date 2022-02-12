@@ -11,4 +11,7 @@ RSpec.describe '/articles routes' do
     end
   end
 
+  it 'should route to articles create' do
+    expect(post '/articles').to route_to('articles#create')
+  end
 end
