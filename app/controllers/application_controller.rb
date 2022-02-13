@@ -7,12 +7,23 @@ class ApplicationController < ActionController::API
     )
     rescue_from ::StandardError, with: lambda { |e| handle_error(e) }
 
-    rescue_from UserAuthenticator::AuthenticationError, with: :authentication_error
+    rescue_from UserAuthenticator::Oauth::AuthenticationError, with: :authentication_oauth_error
+    rescue_from UserAuthenticator::Standard::AuthenticationError, with: :authentication_standard_error
     rescue_from UserAuthenticator::AuthorizationError, with: :authorization_error
 
     before_action :authorize!
 
-    def authentication_error
+    def authentication_standard_error
+      error = {
+        "status" => "401",
+        "source" => { "pointer" => "/data/attributes/password" },
+        "title" =>  "Invalid login or password",
+        "detail" => "You must provide valid credentials in order to exchange them for token."
+      }
+      render json: { "errors": [ error ] }, status: 401
+    end
+
+    def authentication_oauth_error
       error = {
         "status" => "401",
         "source" => { "pointer" => "/code" },

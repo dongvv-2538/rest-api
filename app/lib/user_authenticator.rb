@@ -6,51 +6,31 @@ class UserAuthenticator
     class AuthenticationError < StandardError; end
     class AuthorizationError  < StandardError; end
 
-    attr_reader :user, :access_token
+    attr_reader :authenticator, :access_token
   
-    def initialize(code)
-      @code = code
+    def initialize(code: nil, login: nil, password: nil)
+      @authenticator = if code.present?
+        Oauth.new(code)
+      else 
+        Standard.new(login, password)
+      end
+      
     end
   
     def perform
-
-      raise AuthenticationError if @code.blank?
-      raise AuthenticationError if token.try(:error).present?
-      
-      # register user
-      prepare_user
-
-      @access_token = if user.access_token.present? 
-          user.access_token
-      else 
-          user.create_access_token
-      end 
+      @authenticator.perform
+      set_access_token
     end
 
-    private 
+    def user 
+      authenticator.user
+    end
 
-    def client
-      @client ||= Octokit::Client.new(
-        client_id: GITHUB_CLIENT_ID,
-        client_secret: GITHUB_CLIENT_SECRET
-      )
-    end
-  
-    def token
-      @token ||= client.exchange_code_for_token(@code)
-    end
-  
-    def user_data
-      @user_data ||= Octokit::Client.new(
-        access_token: token
-      ).user.to_h.slice(:login, :avatar_url, :url, :name)
-    end
-  
-    def prepare_user
-      @user = if User.exists?(login: user_data[:login])
-        User.find_by(login: user_data[:login])
+    def set_access_token
+      @access_token = if user.access_token.present?
+        user.access_token
       else
-        User.create(user_data.merge(provider: 'github'))
+        user.create_access_token
       end
     end
 end

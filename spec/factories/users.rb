@@ -4,6 +4,7 @@ FactoryBot.define do
     name { "John Smith" }
     url { "http://example.com" }
     avatar_url { "http://example.com/avatar" }
+    password { "password" }
     provider { "github" }
   end
 end
