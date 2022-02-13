@@ -1,0 +1,11 @@
+AllCops:
+  TargetRubyVersion: 2.4.0
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*_spec.rb"
+    - "jsonapi_errors_handler.gemspec"
+
+Metrics/ModuleLength:
+  Exclude:
+    - "spec/**/*_spec.rb"
